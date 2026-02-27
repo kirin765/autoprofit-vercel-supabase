@@ -2,15 +2,21 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Optional
 
 import stripe
 from fastapi import FastAPI, Header, HTTPException, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 
 from autoprofit import database
 from autoprofit.pipeline import run_pipeline
 from autoprofit.settings import Settings, get_settings
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PUBLIC_DIR = PROJECT_ROOT / "public"
+POSTS_DIR = PUBLIC_DIR / "posts"
+INDEX_FILE = PUBLIC_DIR / "index.html"
 
 
 @asynccontextmanager
@@ -111,6 +117,36 @@ def _handle_stripe_event(settings: Settings, event: dict[str, Any]) -> None:
 def health() -> dict[str, str]:
     settings = get_settings()
     return {"status": "ok", "database_provider": settings.database_provider}
+
+
+@app.get("/", include_in_schema=False)
+def home() -> Response:
+    if INDEX_FILE.exists():
+        return FileResponse(INDEX_FILE)
+
+    posts = sorted(POSTS_DIR.glob("*.html"), key=lambda path: path.name, reverse=True)
+    links = "\n".join(
+        [f'<li><a href="/posts/{path.name}">{path.stem.replace("-", " ")}</a></li>' for path in posts]
+    )
+    html = (
+        "<!doctype html><html><head><meta charset='utf-8'><title>Autoprofit</title></head>"
+        "<body><h1>Autoprofit</h1><p>Homepage fallback rendered by API runtime.</p>"
+        f"<ul>{links or '<li>No posts generated yet.</li>'}</ul></body></html>"
+    )
+    return HTMLResponse(content=html, status_code=200)
+
+
+@app.get("/posts/{slug}.html", include_in_schema=False)
+def post_page(slug: str) -> FileResponse:
+    file_path = POSTS_DIR / f"{slug}.html"
+    if file_path.exists():
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Post not found")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
 
 
 @app.post("/api/cron/run")

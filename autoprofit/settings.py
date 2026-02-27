@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Union
@@ -96,11 +97,36 @@ class Settings(BaseSettings):
         return "sqlite"
 
 
+def _ensure_writable_dir(path: Path, fallback: Path) -> Path:
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        return path
+    except OSError:
+        fallback.mkdir(parents=True, exist_ok=True)
+        return fallback
+
+
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     settings = Settings()
-    settings.data_dir.mkdir(parents=True, exist_ok=True)
-    settings.output_dir.mkdir(parents=True, exist_ok=True)
+
+    is_vercel_runtime = bool(os.getenv("VERCEL"))
+    if is_vercel_runtime:
+        if not settings.data_dir.is_absolute():
+            settings.data_dir = Path("/tmp") / settings.data_dir
+        if not settings.output_dir.is_absolute():
+            settings.output_dir = Path("/tmp") / settings.output_dir
+        if settings.database_provider == "sqlite" and not settings.db_path.is_absolute():
+            settings.db_path = Path("/tmp") / settings.db_path
+
+    settings.data_dir = _ensure_writable_dir(settings.data_dir, Path("/tmp/autoprofit-data"))
+    settings.output_dir = _ensure_writable_dir(settings.output_dir, Path("/tmp/autoprofit-public"))
+
     if settings.database_provider == "sqlite":
-        settings.db_path.parent.mkdir(parents=True, exist_ok=True)
+        parent = settings.db_path.parent
+        try:
+            parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            settings.db_path = settings.data_dir / "autoprofit.db"
+            settings.db_path.parent.mkdir(parents=True, exist_ok=True)
     return settings
