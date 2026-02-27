@@ -1,0 +1,32 @@
+offers:
+  - name: "Amazon Electronics"
+    slug: "amazon-electronics"
+    categories: ["ai", "laptop", "phone", "camera", "headphones", "gaming", "tech", "device"]
+    affiliate_url: "https://www.amazon.com/s?k=best+tech+gadgets&tag={affiliate_tag}"
+    fallback_url: "https://www.amazon.com/s?k=best+tech+gadgets"
+    cta_text: "See top electronics deals"
+    commission_rate: 0.04
+
+  - name: "Canva Pro"
+    slug: "canva-pro"
+    categories: ["design", "template", "marketing", "social", "creator", "video", "content"]
+    affiliate_url: "https://www.canva.com/"
+    fallback_url: "https://www.canva.com/"
+    cta_text: "Start creating with Canva"
+    commission_rate: 0.25
+
+  - name: "NordVPN"
+    slug: "nordvpn"
+    categories: ["security", "privacy", "vpn", "cyber", "safe", "network"]
+    affiliate_url: "https://nordvpn.com/"
+    fallback_url: "https://nordvpn.com/"
+    cta_text: "Protect your connection"
+    commission_rate: 0.30
+
+  - name: "Shopify"
+    slug: "shopify"
+    categories: ["ecommerce", "shop", "store", "sell", "online", "business"]
+    affiliate_url: "https://www.shopify.com/"
+    fallback_url: "https://www.shopify.com/"
+    cta_text: "Launch an online store"
+    commission_rate: 0.20

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Autoprofit - Automated Revenue Pages</title>
+    <style>
+      :root {
+        --bg: #f8f6f1;
+        --text: #1f2937;
+        --card: #ffffff;
+        --accent: #b45309;
+      }
+      body {
+        font-family: "Georgia", serif;
+        margin: 0;
+        background: radial-gradient(circle at 20% 0%, #fff7ed, var(--bg));
+        color: var(--text);
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 14px;
+        padding: 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      }
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Autoprofit</h1>
+      <p>Automatically generated pages optimized for affiliate and subscription monetization.</p>
+      {% if posts %}
+        {% for post in posts %}
+          <article class="card">
+            <h2><a href="/posts/{{ post.slug }}.html">{{ post.title }}</a></h2>
+            <p>{{ post.summary }}</p>
+            <small>Keyword: {{ post.keyword }} | Offer: {{ post.offer_name }}</small>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p>No posts yet. Trigger the pipeline.</p>
+      {% endif %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.26.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "autoprofit"
+version = "0.1.0"
+description = "Autonomous trend-to-revenue content pipeline with affiliate + subscription monetization."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "fastapi>=0.116.1",
+  "feedparser>=6.0.11",
+  "httpx>=0.28.1",
+  "jinja2>=3.1.6",
+  "pydantic-settings>=2.10.1",
+  "psycopg[binary]>=3.2.9",
+  "pyyaml>=6.0.2",
+  "sqlalchemy>=2.0.41",
+  "stripe>=12.5.0",
+  "typer>=0.16.1",
+  "uvicorn>=0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.4.1",
+]
+
+[project.scripts]
+autoprofit = "autoprofit.cli:app"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

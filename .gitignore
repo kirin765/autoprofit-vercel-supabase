@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+
+# Local env and generated runtime data
+.env
+.vercel/
+data/
+
+# Legacy static output path
+site/
+site/public/.vercel/
+.vercel
