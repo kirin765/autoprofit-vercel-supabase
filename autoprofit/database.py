@@ -225,8 +225,7 @@ def start_run(db_target: DBTarget) -> int:
         if inserted and inserted[0] is not None:
             return int(inserted[0])
 
-        latest = conn.execute(select(runs_table.c.id).order_by(runs_table.c.id.desc()).limit(1)).scalar_one()
-        return int(latest)
+        raise RuntimeError("INSERT into runs_table did not return a primary key")
 
 
 def finish_run(db_target: DBTarget, run_id: int, status: str, summary: dict[str, Any]) -> None:
@@ -270,7 +269,7 @@ def upsert_subscription(
             select(subscriptions_table.c.id, subscriptions_table.c.customer_email).where(
                 subscriptions_table.c.subscription_id == subscription_id
             )
-        ).first()
+        ).mappings().first()
 
         payload = {
             "customer_email": customer_email,
@@ -290,8 +289,8 @@ def upsert_subscription(
             )
             return
 
-        if not payload["customer_email"] and len(existing) > 1:
-            payload["customer_email"] = existing[1]
+        if not payload["customer_email"] and existing["customer_email"]:
+            payload["customer_email"] = existing["customer_email"]
 
         conn.execute(
             subscriptions_table.update()

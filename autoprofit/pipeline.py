@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -12,6 +13,8 @@ from autoprofit.publisher import render_index, render_post
 from autoprofit.settings import Settings
 from autoprofit.sources import fetch_trends, load_fallback_trends
 from autoprofit.utils import slugify, utc_now
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -33,7 +36,7 @@ def _fetch_trends_with_retry(settings: Settings, target_limit: int, max_attempts
             if trends:
                 return trends
         except Exception:
-            pass
+            logger.warning("fetch_trends attempt %d/%d failed", attempt, max_attempts, exc_info=True)
 
         if attempt < max_attempts:
             time.sleep(attempt * 2)
@@ -134,6 +137,7 @@ def run_pipeline(settings: Settings, limit: Optional[int] = None, dry_run: bool 
                 )
                 created += 1
             except Exception:
+                logger.warning("Failed to process trend %r", trend.keyword, exc_info=True)
                 failed += 1
 
         if not dry_run:
